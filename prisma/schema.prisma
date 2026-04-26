@@ -29,6 +29,8 @@ model Project {
 
   endpoints Endpoint[]
   apiKeys   ApiKey[]
+
+  @@index([userId])
 }
 
 model Endpoint {
@@ -40,9 +42,11 @@ model Endpoint {
   updatedAt DateTime @updatedAt
 
   projectId String
-  project   Project @relation(fields: [projectId], references: [id])
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
   logs ApiLog[]
+
+  @@index([projectId])
 }
 
 model ApiLog {
@@ -52,7 +56,7 @@ model ApiLog {
   timestamp    DateTime @default(now())
 
   endpointId String
-  endpoint   Endpoint @relation(fields: [endpointId], references: [id])
+  endpoint   Endpoint @relation(fields: [endpointId], references: [id], onDelete: Cascade)
 
   @@index([endpointId])
 }
@@ -63,7 +67,9 @@ model ApiKey {
   createdAt DateTime @default(now())
 
   projectId String
-  project   Project @relation(fields: [projectId], references: [id])
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
 }
 
 enum HttpMethod {

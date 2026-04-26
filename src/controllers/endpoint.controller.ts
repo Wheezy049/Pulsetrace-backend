@@ -22,7 +22,10 @@ export const createEndpointController = async (req: Request, res: Response) => {
             endpoint,
         });
     } catch (error: any) {
-        const status = error.message === "Project not found" ? 404 : 400;
+        let status = 400;
+        if (error.message === "Project not found") status = 404;
+        if (error.message.includes("already exists")) status = 409;
+
         return res.status(status).json({
             message: error.message,
         })

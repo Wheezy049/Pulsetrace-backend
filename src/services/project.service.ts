@@ -1,4 +1,5 @@
 import { prisma } from "../utils/prisma.js";
+import crypto from "crypto";
 
 export const createProject = async (userId: string, name: string, description: string) => {
 
@@ -6,6 +7,9 @@ export const createProject = async (userId: string, name: string, description: s
         where: {
             userId: userId,
             name,
+        },
+        include: {
+            apiKeys: true,
         }
     })
 
@@ -13,13 +17,27 @@ export const createProject = async (userId: string, name: string, description: s
         throw new Error("Project with the same name already exists for this user");
     }
 
-    return await prisma.project.create({
+    const project = await prisma.project.create({
         data: {
             userId: userId,
             name,
             description,
         }
     });
+
+     const apiKeyValue = crypto.randomBytes(32).toString("hex");
+
+     const apiKey = await prisma.apiKey.create({
+        data: {
+            projectId: project.id,
+            key: apiKeyValue,
+        }
+     })
+
+    return {
+        project,
+        apiKey: apiKey.key,
+    }
 };
 
 export const getProjects = async (userId: string) => {

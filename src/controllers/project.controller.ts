@@ -17,11 +17,12 @@ export const createProjectController = async (req: Request, res: Response) => {
       });
     }
 
-    const project = await createProject(userId, name, description);
+    const { project, apiKey } = await createProject(userId, name, description);
 
     res.status(201).json({
       message: "Project created successfully",
       project,
+      apiKey,
     });
   } catch (error: any) {
     const status = error.message.includes("already exists") ? 409 : 400;
@@ -40,6 +41,7 @@ export const getProjectsController = async (req: Request, res: Response) => {
     res.status(200).json({
       message: "Projects retrieved successfully",
       projects,
+
     });
   } catch (error: any) {
     res.status(500).json({

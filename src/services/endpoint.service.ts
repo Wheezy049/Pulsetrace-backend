@@ -16,6 +16,18 @@ export const createEndpoint = async (
     throw new Error("Project not found");
   }
 
+  const existingEndpoint = await prisma.endpoint.findFirst({
+    where: {
+      projectId,
+      path,
+      method,
+    },
+  });
+
+  if (existingEndpoint) {
+    throw new Error("Endpoint with this path and method already exists in this project");
+  }
+
   return await prisma.endpoint.create({
     data: {
       projectId,
@@ -24,7 +36,7 @@ export const createEndpoint = async (
       method,
     },
   });
-}
+};
 
 export const getEndpoints = async (projectId: string, userId: string) => {
   const project = await prisma.project.findFirst({
